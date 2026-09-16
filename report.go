@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
+	"slices"
 	"strings"
 )
 
@@ -57,6 +59,7 @@ func buildReport(resp *APIResponse, codeFiles map[string]string, orderedIDs []st
 			entry.ProbabilityYes = answer.Noul
 			entry.Confidence = nil // nouls carry no confidence
 		case "score":
+			entry.Probabilities = answer.Probabilities
 			maxScore := max(len(answer.Legend)-1, 1)
 			entry.Score = answer.Score
 			entry.MaxScore = new(maxScore)
@@ -149,6 +152,8 @@ func renderTable(report *Report, orderedIDs []string) string {
 // one line per question.
 func renderFeedback(report *Report, orderedIDs []string) string {
 	var lines []string
+	inconclusive := false
+	hasConfidence := false
 	if gate := report.Gate; gate != nil {
 		status := "PASSED"
 		if !gate.Passed {
@@ -156,9 +161,11 @@ func renderFeedback(report *Report, orderedIDs []string) string {
 		}
 		note := ""
 		if gate.Confidence != nil {
+			hasConfidence = true
 			note = fmt.Sprintf(" (confidence %.2f)", *gate.Confidence)
 			if *gate.Confidence < lowConfidenceAt {
-				note += " LOW CONFIDENCE: verdict unreliable, weigh the dimensions below"
+				status = "INCONCLUSIVE"
+				inconclusive = true
 			}
 		}
 		lines = append(lines, fmt.Sprintf("PLAN VALIDATION %s: %s = %q%s", status, gate.Question, gate.Choice, note))
@@ -196,9 +203,22 @@ func renderFeedback(report *Report, orderedIDs []string) string {
 		if entry.LowConfidence {
 			value += " LOW CONFIDENCE"
 		}
+		if len(entry.Probabilities) > 0 {
+			var probabilities []string
+			for _, option := range slices.Sorted(maps.Keys(entry.Probabilities)) {
+				probabilities = append(probabilities, fmt.Sprintf("%s=%.2f", option, entry.Probabilities[option]))
+			}
+			value += " [probabilities: " + strings.Join(probabilities, ", ") + "]"
+		}
+		hasConfidence = hasConfidence || entry.Confidence != nil
 		lines = append(lines, fmt.Sprintf("  %s: %s", qid, value))
 	}
-	if report.Gate != nil && !report.Gate.Passed {
+	if hasConfidence {
+		lines = append(lines, "Confidence measures distribution concentration, not the probability that a verdict is correct.")
+	}
+	if inconclusive {
+		lines = append(lines, "Review inconclusive: inspect the individual judgments and their probabilities. Clarify the question or supply missing context where needed; do not infer a pass or required fix from the selected gate option alone. Exit status still follows that option.")
+	} else if report.Gate != nil && !report.Gate.Passed {
 		lines = append(lines, "Action required: fix the weakest dimensions above, then re-run validation before marking the work complete.")
 	}
 	return strings.Join(lines, "\n")
