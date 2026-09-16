@@ -42,6 +42,11 @@
 // option is chosen, otherwise 2 + the chosen option's index. The JSON report
 // always goes to stdout regardless of exit code, so callers can branch on the
 // exit code and still parse stdout.
+// Confidence is the concentration of the answer's option probabilities,
+// not the probability that the chosen answer is correct. Feedback labels
+// gates below 0.5 confidence INCONCLUSIVE and retains individual judgments
+// and option probabilities. Exit codes still follow the selected option;
+// callers must inspect confidence before treating it as a review verdict.
 //
 // Config file (--config FILE): a JSON object supplying defaults for plan,
 // code, diff, base, questions, gate, model, format, output, and timeout.
@@ -128,6 +133,10 @@ GATES & EXIT CODES
   to stdout regardless of exit code, so callers can branch on the exit
   code and still parse stdout. Reports also carry a "summary"; treat any
   answer with confidence < 0.5 as inconclusive, not pass/fail.
+  Confidence measures distribution concentration, not the probability
+  that an answer is correct. Feedback shows option probabilities and
+  labels an uncertain gate INCONCLUSIVE while preserving all dimensions.
+  Exit codes still follow the chosen option, independently of confidence.
 
     0 = evaluation succeeded (gate passed, if --gate given)
     1 = runtime/API error

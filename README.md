@@ -71,6 +71,19 @@ A complete, runnable example (plan, questions file, and Elixir code) lives in
 
 Treat any answer with confidence < 0.5 as inconclusive, not pass/fail.
 
+Confidence measures how concentrated the option probabilities are; it is
+not the probability that the chosen answer is correct. For example, a score
+split between two neighboring good levels can have low confidence even
+though both levels describe acceptable code. See TypeSafe's
+[confidence documentation](https://docs.typesafe.ai/confidence).
+
+`--format feedback` shows option probabilities alongside each Choice and
+Score, and labels a gate below 0.5 confidence `INCONCLUSIVE`. Individual
+judgments remain visible: uncertainty about the overall verdict does not
+make every dimension uncertain. Exit codes and JSON `gate.passed` still
+reflect the selected option, independently of confidence; callers must
+inspect confidence before deciding whether to act, including in hook mode.
+
 ## Gates and exit codes
 
 `--gate QUESTION_ID` points at a `choice` question and makes the exit code
