@@ -143,7 +143,7 @@ func gitDiffNewFile(top, name string) (string, error) {
 	cmd.Dir = top
 	out, err := cmd.Output()
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
+		if exitErr, ok := errors.AsType[*exec.ExitError](err); ok && exitErr.ExitCode() == 1 {
 			return string(out), nil
 		}
 		return "", err
@@ -158,7 +158,7 @@ func gitOutput(dir string, args ...string) (string, error) {
 	}
 	out, err := cmd.Output()
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
 			detail := strings.TrimSpace(string(exitErr.Stderr))
 			if detail != "" {
 				return "", fmt.Errorf("%s", detail)

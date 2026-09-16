@@ -8,6 +8,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"slices"
 	"strconv"
 	"time"
 )
@@ -57,7 +58,7 @@ func validateAnswers(resp *APIResponse, questions json.RawMessage) error {
 		switch question.Type {
 		case "choice":
 			options, _ = orderedKeys(question.Criteria)
-			if indexOf(options, answer.Choice) < 0 {
+			if !slices.Contains(options, answer.Choice) {
 				return fmt.Errorf("question %q returned an unknown choice %q", id, answer.Choice)
 			}
 		case "score":
@@ -160,9 +161,7 @@ func callAPI(apiKey string, payload []byte, timeoutSeconds float64) (*APIRespons
 					}
 				}
 				// A hostile or confused Retry-After must not park the process.
-				if wait > maxRetryWait {
-					wait = maxRetryWait
-				}
+				wait = min(wait, maxRetryWait)
 				fmt.Fprintf(os.Stderr, "API busy (HTTP %d); retrying in %s...\n",
 					resp.StatusCode, wait.Round(time.Second))
 				time.Sleep(wait)

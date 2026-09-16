@@ -61,10 +61,11 @@ import (
 	"flag"
 	"fmt"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"runtime/debug"
-	"sort"
+	"slices"
 	"strings"
 	"unicode/utf8"
 )
@@ -474,7 +475,7 @@ func run() int {
 		if !ok || answer.Choice == "" {
 			return runtimeErrorf("gate question '%s' returned no choice answer", gate)
 		}
-		idx := indexOf(gateOptions, answer.Choice)
+		idx := slices.Index(gateOptions, answer.Choice)
 		if idx < 0 {
 			return runtimeErrorf("gate answer '%s' is not one of the options %v", answer.Choice, gateOptions)
 		}
@@ -607,8 +608,7 @@ func collectCode(paths []string) (map[string]string, error) {
 				return nil
 			}
 			if rel != "." {
-				parts := strings.Split(rel, string(filepath.Separator))
-				for _, part := range parts {
+				for part := range strings.SplitSeq(rel, string(filepath.Separator)) {
 					if strings.HasPrefix(part, ".") || skipDirNames[part] {
 						if d.IsDir() {
 							return filepath.SkipDir
@@ -620,7 +620,6 @@ func collectCode(paths []string) (map[string]string, error) {
 			if d.IsDir() {
 				return nil
 			}
-			// Do not follow links or open devices/pipes discovered by a walk.
 			if !d.Type().IsRegular() {
 				return nil
 			}
@@ -785,20 +784,6 @@ func orderedKeys(raw json.RawMessage) ([]string, error) {
 	return keys, nil
 }
 
-func indexOf(list []string, value string) int {
-	for i, v := range list {
-		if v == value {
-			return i
-		}
-	}
-	return -1
-}
-
 func sortedKeys(m map[string]string) []string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return keys
+	return slices.Sorted(maps.Keys(m))
 }

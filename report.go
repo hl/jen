@@ -17,7 +17,7 @@ type SummaryEntry struct {
 	Choice         string                     `json:"choice,omitempty"`
 	Probabilities  map[string]float64         `json:"probabilities,omitempty"`
 	Confidence     *float64                   `json:"confidence,omitempty"`
-	LowConfidence  bool                       `json:"low_confidence,omitempty"`
+	LowConfidence  bool                       `json:"low_confidence,omitzero"`
 }
 
 // GateResult records how the gate question resolved.
@@ -57,16 +57,12 @@ func buildReport(resp *APIResponse, codeFiles map[string]string, orderedIDs []st
 			entry.ProbabilityYes = answer.Noul
 			entry.Confidence = nil // nouls carry no confidence
 		case "score":
-			maxScore := len(answer.Legend) - 1
-			if maxScore < 1 {
-				maxScore = 1
-			}
+			maxScore := max(len(answer.Legend)-1, 1)
 			entry.Score = answer.Score
-			entry.MaxScore = &maxScore
+			entry.MaxScore = new(maxScore)
 			entry.Legend = answer.Legend
 			if answer.Score != nil {
-				normalized := *answer.Score / float64(maxScore)
-				entry.Normalized = &normalized
+				entry.Normalized = new(*answer.Score / float64(maxScore))
 			}
 		case "choice":
 			entry.Choice = answer.Choice

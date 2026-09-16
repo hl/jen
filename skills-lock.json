@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "skills/typesafe-ai/SKILL.md",
       "computedHash": "9cd84c5e535dec8dec59917c110f9c00b4a61faadb86b432ec7e41051170af12"
+    },
+    "use-modern-go": {
+      "source": "JetBrains/go-modern-guidelines",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/use-modern-go/SKILL.md",
+      "computedHash": "c308fc949fc8a369b5ea0f2d57072789eda8d05f420b972c67576b285b7ba539"
     }
   }
 }
