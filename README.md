@@ -8,7 +8,7 @@ and verdicts — in a single API request.
 
 ## Installation
 
-Requires Go (see `go.mod` for the minimum version) and git (for `--diff` mode).
+Requires Go 1.26+ (see `go.mod`) and git (for `--diff` mode).
 
 ```sh
 git clone https://github.com/hl/jen.git
@@ -151,3 +151,6 @@ make check          # go vet + build
 make test           # go test ./...
 make test-examples  # run the Elixir example tests (requires Elixir)
 ```
+
+The `jen` binary at the repo root is a build artifact; it is gitignored
+(`.gitignore`) and never committed.

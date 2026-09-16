@@ -20,6 +20,8 @@ is a compelling reason to add a dependency.
 | `*_test.go`       | Unit and integration tests (`main_test.go`, `git_test.go`, `review_test.go`). |
 | `examples/`       | Runnable example: plan, questions file, and Elixir code under review. |
 | `Makefile`        | `build`, `install`, `check`, `test`, `test-examples`, `clean`.        |
+| `.gitignore`      | Ignores the `jen` build artifact (never committed).                    |
+| `.agents/skills/` | Locally installed agent skills (managed via `skills-lock.json`).     |
 
 ## Build and test
 
@@ -66,11 +68,13 @@ them. Changing any of them is a breaking change.
 ## Conventions
 
 - Standard Go style: `gofmt`-clean, `go vet`-clean, doc comments on exported
-  and non-obvious declarations.
+  and non-obvious declarations. Go 1.26 idioms are in use (`new(value)`,
+  `errors.AsType`, `min`/`max`, iterator-based `maps`/`slices`/`strings`
+  helpers) — keep them up when editing.
 - Errors are reported via `usageErrorf` (exit 2) vs `runtimeErrorf` (exit 1)
   depending on whether the user can fix it by changing inputs.
-- The `jen` binary at the repo root is a build artifact — never commit
-  changes to it.
+- The `jen` binary at the repo root is a build artifact — it is gitignored
+  (`.gitignore`) and never committed.
 - Version is stamped at build time via `-ldflags "-X main.version=..."`
   (see `Makefile`); do not hardcode versions in source.
 
