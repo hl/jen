@@ -1,0 +1,59 @@
+{
+  "plan_satisfaction": {
+    "type": "score",
+    "instructions": "How completely does the change under review implement the requirements described in the plan in `plan`? If a `diff` field is present, judge the change shown in `diff`; `code` holds the full current content of the changed files for context. Otherwise judge `code` directly. Judge only coverage of what the plan asks for, not code quality.",
+    "criteria": [
+      "The code ignores the plan or implements something unrelated",
+      "The code implements only a small fraction of the plan's requirements",
+      "The code implements the core requirement but misses several specified behaviors or details",
+      "The code implements nearly all requirements with only minor gaps",
+      "The code fully implements every requirement stated in the plan"
+    ]
+  },
+  "plan_deviation": {
+    "type": "noul",
+    "instructions": "Does the change under review add significant behavior, features, or scope that the plan in `plan` never asked for? If a `diff` field is present, judge the change shown in `diff` (with `code` as full-file context); otherwise judge `code` directly.",
+    "criteria": {
+      "true": "The code adds notable unplanned functionality or goes beyond the plan's scope",
+      "false": "The code stays within the plan's scope; any extras are trivial or clearly implied"
+    }
+  },
+  "idiomatic_elixir": {
+    "type": "score",
+    "instructions": "How idiomatic is the Elixir code in `code`? When a `diff` field is present, `code` contains the full current content of the changed files — judge those, focusing on what the diff changed. Consider use of pattern matching, immutability-friendly constructs, pipe operator, module/function naming, documentation, and standard library usage.",
+    "criteria": [
+      "Deeply unidiomatic: fights the language, ignores pattern matching, imperative style throughout",
+      "Mostly unidiomatic: works but reads like a direct translation from another language",
+      "Acceptable: uses core Elixir constructs but misses common conventions or stdlib helpers",
+      "Idiomatic: good use of pattern matching, pipes, and conventions with only small lapses",
+      "Exemplary: reads like code an experienced Elixir developer would write and be proud of"
+    ]
+  },
+  "can_be_simplified": {
+    "type": "noul",
+    "instructions": "Could the code in `code` be meaningfully simplified — shorter, clearer, or using fewer moving parts — without changing its behavior or losing required functionality? When a `diff` field is present, focus on the changed code.",
+    "criteria": {
+      "true": "There are clear, concrete simplifications available (redundant logic, needless indirection, reinventions of stdlib functions)",
+      "false": "The code is already about as simple as the problem allows"
+    }
+  },
+  "correctness_risk": {
+    "type": "score",
+    "instructions": "How likely is the change under review to contain bugs, edge-case failures, or compile/runtime errors, judged against the behavior required by `plan`? If a `diff` field is present, judge the change in `diff` using `code` for full-file context; otherwise judge `code` directly.",
+    "criteria": [
+      "Very likely broken: would not compile or fails the plan's core behavior",
+      "Likely has bugs: plausible edge cases or error paths are mishandled",
+      "Mostly sound: correct for typical inputs with only minor risks",
+      "Solid: handles the required behavior and reasonable edge cases correctly"
+    ]
+  },
+  "overall_verdict": {
+    "type": "choice",
+    "instructions": "Given the plan in `plan` and the change under review (the `diff` field if present, otherwise the code in `code`, with `code` as full-file context either way), what should happen next with this code?",
+    "criteria": {
+      "accept": "The code satisfies the plan and is of acceptable quality; no further work needed",
+      "revise": "The code is on the right track but needs specific fixes or improvements before acceptance",
+      "rewrite": "The code fundamentally misses the plan or is so poor that starting over is better"
+    }
+  }
+}

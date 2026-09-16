@@ -1,0 +1,6 @@
+{
+  "plan": "examples/plan.md",
+  "code": ["examples/lib/"],
+  "questions": "examples/questions.elixir.json",
+  "gate": "overall_verdict"
+}
